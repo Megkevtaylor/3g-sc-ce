@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voiceflow AI Voice Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            min-height: 100vh;
+        }
+        .control-panel {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .voice-button {
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .voice-button:hover {
+            background-color: #0056b3;
+        }
+        .voice-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #transcript {
+            margin-top: 10px;
+            padding: 10px;
+            color: #666;
+            font-style: italic;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            background-color: #ccc;
+        }
+        .status-indicator.active {
+            background-color: #28a745;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <h1>AI Voice Chat with Voiceflow</h1>
+        <button id="voiceButton" class="voice-button" onclick="toggleListening()">
+            <span id="statusIndicator" class="status-indicator"></span>
+            Start Voice Input
+        </button>
+        <p id="transcript"></p>
+    </div>
+
+    <div id="VG_OVERLAY_CONTAINER" style="width: 0; height: 0;">
+        <!-- Voiceflow widget container -->
+    </div>
+
+    <script>
+        let recognition;
+        let isListening = false;
+        const synth = window.speechSynthesis;
+
+        function toggleListening() {
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            if (!("webkitSpeechRecognition" in window)) {
+                alert("Your browser does not support speech recognition. Please try Chrome!");
+                return;
+            }
+
+            if (!recognition) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = "en-US";
+
+                recognition.onstart = () => {
+                    console.log("Listening started...");
+                    isListening = true;
+                    updateUI();
+                };
+
+                recognition.onend = () => {
+                    console.log("Listening stopped");
+                    isListening = false;
+                    updateUI();
+                };
+
+                recognition.onresult = (event) => {
+                    const text = event.results[0][0].transcript;
+                    document.getElementById("transcript").textContent = "You said: " + text;
+                    
+                    // Send message to Voiceflow widget
+                    window.postMessage({
+                        type: "voiceflow-message",
+                        text: text
+                    }, "*");
+                };
+
+                recognition.onerror = (event) => {
+                    console.error("Speech recognition error:", event.error);
+                    isListening = false;
+                    updateUI();
+                };
+            }
+
+            recognition.start();
+        }
+
+        function stopListening() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+
+        function updateUI() {
+            const button = document.getElementById("voiceButton");
+            const statusIndicator = document.getElementById("statusIndicator");
+            
+            button.textContent = isListening ? "Stop Voice Input" : "Start Voice Input";
+            statusIndicator.className = isListening ? "status-indicator active" : "status-indicator";
+        }
+
+        // Voiceflow Widget Configuration
+        window.VG_CONFIG = {
+            ID: "Xs04Hsrstrw7QrH", // Replace with your Agent ID
+            region: 'na',
+            render: 'bottom-right',
+            stylesheets: [
+                "https://vg-bunny-cdn.b-cdn.net/vg_live_build/styles.css"
+            ]
+        };
+
+        // Load Voiceflow Widget
+        var VG_SCRIPT = document.createElement("script");
+        VG_SCRIPT.src = "https://vg-bunny-cdn.b-cdn.net/vg_live_build/vg_bundle.js";
+        VG_SCRIPT.defer = true;
+        document.body.appendChild(VG_SCRIPT);
+    </script>
+</body>
+</html> 
