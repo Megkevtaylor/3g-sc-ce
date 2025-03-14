@@ -2,6 +2,8 @@
 
 A web-based voice chat interface that integrates with Voiceflow's AI chatbot platform. This application allows users to interact with a Voiceflow chatbot using voice input, creating a seamless voice-based conversation experience.
 
+🔗 **Live Demo:** [https://megkevtaylor.github.io/3g-sc-ce/](https://megkevtaylor.github.io/3g-sc-ce/)
+
 ## Features
 
 - Voice input recognition using Web Speech API
@@ -15,8 +17,8 @@ A web-based voice chat interface that integrates with Voiceflow's AI chatbot pla
 
 1. Clone this repository:
 ```bash
-git clone [your-repository-url]
-cd [repository-name]
+git clone https://github.com/Megkevtaylor/3g-sc-ce.git
+cd 3g-sc-ce
 ```
 
 2. Replace the Voiceflow Agent ID in `index.html`:
@@ -26,6 +28,15 @@ ID: "Xs04Hsrstrw7QrH", // Replace with your Agent ID
 ```
 
 3. Serve the files using a local web server or deploy to your hosting platform.
+
+## Deployment
+
+This project is deployed using GitHub Pages. To deploy your own version:
+
+1. Fork this repository
+2. Enable GitHub Pages in your repository settings
+3. Select the `gh-pages` branch as the source
+4. Your site will be available at `https://[your-username].github.io/3g-sc-ce/`
 
 ## Usage
 
